@@ -1,14 +1,186 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width='device-width', initial-scale=1.0">
-  <link rel="stylesheet" href="/css/all.min.css">
-  <link rel="stylesheet" href="/css/normalize.css">
-  <link rel="stylesheet" href="/css/main.css">
-  <title>Template-4</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Foundations - Ultimate Simulator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f6f8fa; color: #24292f; line-height: 1.6; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        h1 { color: #0969da; text-align: center; border-bottom: 2px solid #eaecef; padding-bottom: 10px; }
+        .info { text-align: center; color: #57606a; margin-bottom: 30px; font-weight: bold; }
+        .question-block { margin-bottom: 25px; padding: 15px; border: 1px solid #d0d7de; border-radius: 6px; background-color: #ffffff; }
+        .question-text { font-weight: bold; margin-bottom: 10px; font-size: 1.1em; }
+        .options { list-style-type: none; padding: 0; }
+        .options li { margin-bottom: 8px; }
+        label { cursor: pointer; display: flex; align-items: baseline; gap: 10px; padding: 8px; border-radius: 4px; transition: background-color 0.2s; }
+        label:hover { background-color: #f3f4f6; }
+        .btn { display: block; width: 100%; padding: 15px; background-color: #2da44e; color: white; border: none; border-radius: 6px; font-size: 1.2em; font-weight: bold; cursor: pointer; margin-top: 30px; transition: background-color 0.2s; }
+        .btn:hover { background-color: #2c974b; }
+        #results { margin-top: 30px; padding: 20px; text-align: center; font-size: 1.5em; font-weight: bold; display: none; border-radius: 6px; }
+        .correct-ans { color: #1a7f37; font-weight: bold; margin-top: 10px; display: none; }
+    </style>
 </head>
 <body>
-  
+
+<div class="container">
+    <h1>GitHub Foundations (GH-900) Simulator</h1>
+    <p class="info">60 Highly Anticipated Questions | Target: 100% | Prepared from Al-Zaytoonah Question Bank [cite: 1, 10, 11]</p>
+    
+    <form id="quizForm">
+        <div id="questions-container"></div>
+        <button type="button" class="btn" onclick="calculateScore()">Submit & Reveal Score</button>
+    </form>
+
+    <div id="results"></div>
+</div>
+
+<script>
+    const questions = [
+        // Domain 1
+        { q: "1. What is the PRIMARY difference between a Centralized VCS (CVCS) and a Distributed VCS (DVCS)? [cite: 49]", opts: ["A) CVCS is faster than DVCS for large projects [cite: 50]", "B) In DVCS, clients clone the full repository including its entire history, while CVCS clients only check out the latest snapshot [cite: 51]", "C) DVCS requires a central server to function, while CVCS does not [cite: 52]", "D) CVCS supports branching, while DVCS does not [cite: 53]"], ans: 1 },
+        { q: "2. Which of the following is the BIGGEST disadvantage of Centralized Version Control Systems (CVCS)? [cite: 55]", opts: ["A) They do not support file versioning [cite: 56]", "B) They are too expensive to maintain [cite: 57]", "C) They have a single point of failure; if the central server goes down, no one can collaborate or save changes [cite: 58, 59]", "D) They cannot handle multiple developers simultaneously [cite: 60]"], ans: 2 },
+        { q: "3. Linus Torvalds created Git in what year, and for what primary purpose? [cite: 61]", opts: ["A) 2000, to replace Subversion [cite: 62]", "B) 2005, to manage the Linux kernel development with speed and support for large-scale non-linear development [cite: 63]", "C) 2008, to build a cloud-based code hosting platform [cite: 64]", "D) 2010, to provide a GUI-based version control system [cite: 65]"], ans: 1 },
+        { q: "4. Which of the following are examples of Distributed Version Control Systems? [cite: 67]", opts: ["A) CVS & Subversion [cite: 68, 70]", "B) Git & Mercurial [cite: 69, 71]", "C) Subversion & Perforce [cite: 70, 72]", "D) CVS & Perforce [cite: 68, 72]"], ans: 1 },
+        { q: "5. How does Git store data, which makes it fundamentally different from most other VCS tools? [cite: 78]", opts: ["A) As a list of file-based changes (deltas) over time [cite: 79]", "B) As a series of snapshots of the entire filesystem at each commit [cite: 80]", "C) As compressed ZIP archives of changed files only [cite: 81]", "D) As binary diffs stored in a central database [cite: 82]"], ans: 1 },
+        { q: "6. Which algorithm does Git use to checksum all stored content, ensuring data integrity? [cite: 84]", opts: ["A) MD5 [cite: 85]", "B) RSA-256 [cite: 86]", "C) SHA-1 (producing a 40-character hexadecimal string) [cite: 87]", "D) AES-128 [cite: 88]"], ans: 2 },
+        { q: "7. What are the THREE states a file can be in within a Git project? [cite: 90]", opts: ["A) Created, Edited, Deleted [cite: 91]", "B) Modified, Staged, Committed [cite: 92]", "C) Tracked, Untracked, Ignored [cite: 93]", "D) Local, Remote, Archived [cite: 94]"], ans: 1 },
+        { q: "8. In Git, what does the 'Staging Area' (Index) represent? [cite: 96]", opts: ["A) The area where deleted files are temporarily stored [cite: 97]", "B) A cloud storage location for backup purposes [cite: 98]", "C) A place that stores what will go into the NEXT commit snapshot [cite: 99]", "D) The remote server where code is pushed [cite: 100]"], ans: 2 },
+        { q: "9. What is a key advantage of Git's 'local operations' design? [cite: 102]", opts: ["A) It forces all developers to be online at all times [cite: 103]", "B) It allows developers to work fully (browse history, commit, etc.) even without an internet connection [cite: 104]", "C) It automatically syncs changes to the remote server every minute [cite: 105]", "D) It prevents unauthorized access by requiring server authentication [cite: 106]"], ans: 1 },
+        { q: "10. Which of the following best describes what GitHub is, compared to Git? [cite: 119]", opts: ["A) GitHub is a newer version of Git [cite: 120]", "B) Git is a command-line distributed VCS; GitHub is a cloud-hosted service (owned by Microsoft) for hosting Git repositories with collaboration features [cite: 121, 122]", "C) GitHub only works with private repositories; Git works with public ones [cite: 123]", "D) Git and GitHub are two names for the same product [cite: 123]"], ans: 1 },
+        { q: "11. A developer wants to access GitHub without a web browser or command line. Which tool should they use? [cite: 132]", opts: ["A) GitHub Enterprise Server [cite: 133]", "B) GitHub Desktop (a standalone GUI application) [cite: 134]", "C) GitHub Codespaces [cite: 135]", "D) GitHub CLI [cite: 136]"], ans: 1 },
+        { q: "12. What type of GitHub account provides centralized management of multiple organizations with SAML SSO and advanced security policies? [cite: 148]", opts: ["A) Personal (Free) account [cite: 149]", "B) Organization (Teams) account [cite: 150]", "C) Enterprise account [cite: 151]", "D) GitHub Pro account [cite: 152]"], ans: 2 },
+        { q: "13. A team working on open-source projects wants a FREE GitHub organization account. What is the main condition? [cite: 154]", opts: ["A) They must have fewer than 10 members [cite: 155]", "B) All projects stored must be open source (public repositories) [cite: 156]", "C) They must upgrade to GitHub Pro first [cite: 157]", "D) They must be a registered non-profit organization [cite: 158]"], ans: 1 },
+        { q: "14. How many GitHub Actions minutes per month does a GitHub Free personal account receive? [cite: 183]", opts: ["A) 500 minutes [cite: 184]", "B) 1000 minutes [cite: 185]", "C) 2000 minutes [cite: 186]", "D) 3000 minutes [cite: 187]"], ans: 2 },
+        
+        // Domain 2
+        { q: "15. When creating a new repository on GitHub, which THREE files can the platform automatically add for you? [cite: 195]", opts: ["A) index.html, style.css, app.js [cite: 196]", "B) README, LICENSE, .gitignore [cite: 197]", "C) CONTRIBUTING, CODEOWNERS, CHANGELOG [cite: 198]", "D) Dockerfile, package.json, requirements.txt [cite: 199]"], ans: 1 },
+        { q: "16. To display a README as your GitHub profile page, what must you do? [cite: 208]", opts: ["A) Upload the README to any public repository [cite: 209]", "B) Create a PUBLIC repository with the same name as your USERNAME and place the README at the root [cite: 210, 211]", "C) Send a request to GitHub support to enable profile README [cite: 212]", "D) Add the README to your organization's main repository [cite: 213]"], ans: 1 },
+        { q: "17. What happens when you run 'git clone' on a repository? [cite: 221]", opts: ["A) Only the latest version of the files is downloaded [cite: 222]", "B) A full copy of the repository including its complete history is downloaded to your local machine [cite: 223]", "C) Only the README and LICENSE files are downloaded [cite: 228]", "D) The repository is deleted from the remote and moved locally [cite: 229]"], ans: 1 },
+        { q: "18. After forking a repository, the fork receives new commits from the original. What does GitHub do automatically? [cite: 231]", opts: ["A) Automatically merges the new commits into the fork [cite: 232]", "B) Deletes the fork and creates a fresh one [cite: 233]", "C) Notifies you that your fork is behind but does NOT auto-update it [cite: 234]", "D) Sends an email to all collaborators requesting a merge [cite: 235]"], ans: 2 },
+        { q: "19. To keep a fork synchronized with the original (upstream) repository, what is the RECOMMENDED approach? [cite: 237, 238]", opts: ["A) Delete and re-fork the repository every time there are updates [cite: 239]", "B) Add the original repository as a remote named 'upstream', fetch changes, merge them locally, then push to your fork (origin) [cite: 240, 241]", "C) Automatically enabled by GitHub; no manual action needed [cite: 242]", "D) Submit a Pull Request from the original to your fork [cite: 243]"], ans: 1 },
+        { q: "20. Which of the following is TRUE about changing a repository's visibility from Private to Public on GitHub? [cite: 262]", opts: ["A) It only affects new files added after the change [cite: 263]", "B) The change is reversible and has no major consequences [cite: 264]", "C) It makes the code visible to anyone, allows forking by anyone, disables push rule sets, and all activity becomes public [cite: 265, 266]", "D) It automatically transfers ownership to a GitHub organization [cite: 267]"], ans: 2 },
+
+        // Domain 3
+        { q: "21. What is the PRIMARY purpose of GitHub Issues? [cite: 274]", opts: ["A) To store database records for web applications [cite: 275]", "B) To track tasks, bugs, feature requests, and other work items related to a repository [cite: 276, 277]", "C) To configure automated deployment pipelines [cite: 278]", "D) To manage billing and subscription settings [cite: 279]"], ans: 1 },
+        { q: "22. Where must the CODEOWNERS file be placed for GitHub to recognize it? [cite: 293, 294]", opts: ["A) In any subdirectory of the project [cite: 295]", "B) In the root directory, .github/folder, or docs/folder [cite: 296]", "C) Only inside the .github/folder [cite: 297]", "D) Only in the root directory [cite: 298]"], ans: 1 },
+        { q: "23. When a Pull Request is created that modifies files listed in the CODEOWNERS file, what does GitHub do AUTOMATICALLY? [cite: 300, 301]", opts: ["A) Merges the pull request without review [cite: 302]", "B) Closes the pull request and notifies the repository owner [cite: 303]", "C) Requests a review from the designated code owners [cite: 304]", "D) Converts the pull request into a draft [cite: 308]"], ans: 2 },
+        { q: "24. What is a Draft Pull Request? [cite: 317]", opts: ["A) A pull request that has been automatically approved by code owners [cite: 318]", "B) A pull request that indicates work in progress; it CANNOT be merged and does NOT automatically notify code owners for review [cite: 319, 320]", "C) A pull request submitted by an external contributor [cite: 321]", "D) A pull request that has failed all CI/CD checks [cite: 322]"], ans: 1 },
+        { q: "25. During a Pull Request review, what does 'Request Changes' mean? [cite: 330]", opts: ["A) The reviewer approves the code and it is ready to merge [cite: 331]", "B) The reviewer leaves general comments with no formal decision [cite: 332]", "C) The reviewer indicates there are problems that MUST be fixed before the code can be merged [cite: 333, 334]", "D) The reviewer requests that the pull request be closed permanently [cite: 335]"], ans: 2 },
+        { q: "26. A team wants a clean, linear commit history where each feature is represented by a SINGLE commit. Which merge strategy should they use? [cite: 362, 363]", opts: ["A) Create a merge commit [cite: 364]", "B) Rebase and merge [cite: 365]", "C) Squash and merge [cite: 366]", "D) Fast-forward merge [cite: 367]"], ans: 2 },
+        { q: "27. In a Pull Request, what does the 'Base' branch represent? [cite: 369]", opts: ["A) The branch containing the new changes to be reviewed [cite: 370]", "B) The branch you want to MERGE INTO (the target branch) [cite: 371]", "C) The backup branch created before merging [cite: 372]", "D) The branch that was most recently created [cite: 373]"], ans: 1 },
+        { q: "28. How is GitHub Discussions DIFFERENT from GitHub Issues? [cite: 385]", opts: ["A) Discussions are only available to Enterprise accounts [cite: 386]", "B) Issues are for tracking tasks and bugs with code changes; Discussions are for open conversations and Q&A that aren't directly tied to code changes [cite: 387, 388]", "C) Discussions automatically create pull requests when resolved [cite: 389]", "D) Issues support markdown; Discussions do not [cite: 390]"], ans: 1 },
+        { q: "29. What happens when you 'Convert to Issue' a GitHub Discussion? [cite: 399]", opts: ["A) The discussion is permanently deleted [cite: 400]", "B) A new issue is created with the discussion text, and a soft link connects the new issue to the original discussion [cite: 401, 402]", "C) The discussion is archived and locked [cite: 403]", "D) The discussion is moved to a different repository [cite: 404]"], ans: 1 },
+        { q: "30. What is a GitHub 'Gist'? [cite: 423]", opts: ["A) A type of organization repository for private projects [cite: 424]", "B) A simple way to share code snippets or text; each Gist is a full Git repository that can be cloned and forked [cite: 425, 426]", "C) A dashboard widget for monitoring repository activity [cite: 427]", "D) A GitHub Actions workflow template [cite: 428]"], ans: 1 },
+        { q: "31. Which statement about 'Secret' Gists is CORRECT? [cite: 430]", opts: ["A) They are completely private and inaccessible to everyone except the owner [cite: 431]", "B) They are encrypted end-to-end for maximum security [cite: 432]", "C) They do not appear in search or discovery, but anyone with the URL can access them [cite: 433]", "D) They can only be viewed by GitHub Enterprise members [cite: 434]"], ans: 2 },
+        { q: "32. Can a public Gist be converted to a secret Gist? [cite: 435]", opts: ["A) Yes, at any time from the Gist settings [cite: 436]", "B) No; a public Gist cannot be converted to secret, but a secret Gist CAN be converted to public [cite: 437]", "C) Yes, but only by contacting GitHub support [cite: 438]", "D) No; neither type can be converted to the other [cite: 439]"], ans: 1 },
+        { q: "33. What is the purpose of GitHub Wikis? [cite: 441]", opts: ["A) To store and run automated test scripts [cite: 442]", "B) To provide a collaborative space for creating documentation and multi-page knowledge bases for a repository [cite: 443, 444]", "C) To host the project's live website [cite: 445]", "D) To track billing and usage statistics [cite: 446]"], ans: 1 },
+        { q: "34. Which Issue filtering query would you use to find issues that have NO assignee? [cite: 458]", opts: ["A) assignee:none [cite: 459]", "B) is:unassigned [cite: 460]", "C) no:assignee [cite: 461]", "D) assigned:false [cite: 462]"], ans: 2 },
+        { q: "35. You want to filter issues in a repository and ensure results show only 'issues' and NOT pull requests. Which filter do you use? [cite: 464, 465]", opts: ["A) type:issue [cite: 466]", "B) is:issue [cite: 467]", "C) kind:issue [cite: 468]", "D) filter:issue [cite: 469]"], ans: 1 },
+        { q: "36. Issue Forms (the newer evolution of Issue Templates) are written in which format? [cite: 487]", opts: ["A) Markdown (.md) [cite: 488]", "B) YAML [cite: 489]", "C) JSON [cite: 490]", "D) HTML [cite: 491]"], ans: 1 },
+        { q: "37. What is the KEY behavioral difference between Issue Templates and Issue Forms? [cite: 493]", opts: ["A) Issue Templates are newer; Issue Forms are deprecated [cite: 494]", "B) Issue Templates pre-fill a free-text markdown box; Issue Forms use YAML to create strict structured input fields [cite: 495, 496]", "C) Issue Forms only work in private repositories [cite: 497]", "D) Issue Templates require admin approval before being shown [cite: 498]"], ans: 1 },
+        { q: "38. In which folder must both Issue Templates and Issue Forms be stored? [cite: 499]", opts: ["A) .github/PULL_REQUEST_TEMPLATE/ [cite: 500]", "B) docs/templates/ [cite: 501]", "C) ISSUE_TEMPLATE/ [cite: 502]", "D) .github/ISSUES/ [cite: 503]"], ans: 2 },
+        
+        // Domain 4
+        { q: "39. In a GitHub Actions workflow YAML file, which keyword defines WHAT EVENT triggers the workflow to run? [cite: 518]", opts: ["A) jobs [cite: 519]", "B) steps [cite: 520]", "C) on [cite: 521]", "D) runs-on [cite: 522]"], ans: 2 },
+        { q: "40. Which keyword in a GitHub Actions workflow file specifies the RUNNER environment (e.g., Ubuntu Linux)? [cite: 524]", opts: ["A) uses [cite: 525]", "B) on [cite: 526]", "C) runs-on [cite: 527]", "D) environment [cite: 528]"], ans: 2 },
+        { q: "41. What are the THREE core components required to build any GitHub Actions workflow? [cite: 530]", opts: ["A) name, run-name, uses [cite: 531]", "B) trigger (on), jobs, steps [cite: 532]", "C) push, pull_request, deploy [cite: 533]", "D) YAML, Docker, runner [cite: 534]"], ans: 1 },
+        { q: "42. What is the MAIN difference between github.dev (the web editor) and GitHub Codespaces? [cite: 547]", opts: ["A) github.dev costs money; Codespaces is always free [cite: 548]", "B) github.dev provides a full virtual machine; Codespaces does not [cite: 549]", "C) github.dev launches instantly with NO compute resources; Codespaces provides a full VM with terminal access [cite: 550, 551]", "D) github.dev only works with public repositories [cite: 552]"], ans: 2 },
+        { q: "43. Which file is used to configure a GitHub Codespaces Dev Container? [cite: 554]", opts: ["A) .github/codespaces.json [cite: 555]", "B) docker-compose.yml [cite: 556]", "C) devcontainer.json [cite: 557]", "D) codespace-config.yaml [cite: 558]"], ans: 2 },
+        { q: "44. What is GitHub Copilot primarily designed to do? [cite: 567]", opts: ["A) Manage repository permissions [cite: 568]", "B) Automate deployment pipelines [cite: 569]", "C) Act as an AI-powered developer tool that provides code completions, chat assistance, and CLI suggestions [cite: 570, 571]", "D) Scan repositories for security vulnerabilities [cite: 572]"], ans: 2 },
+        { q: "45. Which statement about GitHub Copilot's 'Telemetry' is CORRECT? [cite: 591]", opts: ["A) Both Individual and Business plans include telemetry [cite: 592]", "B) Neither plan includes telemetry [cite: 593]", "C) Copilot Individual INCLUDES telemetry; Copilot Business does NOT [cite: 594]", "D) Copilot Business includes telemetry; Copilot Individual does not [cite: 595]"], ans: 2 },
+        { q: "46. In GitHub Actions, which keyword is used to specify a reusable action from a remote repository? [cite: 915]", opts: ["A) run [cite: 916]", "B) with [cite: 917]", "C) uses [cite: 918]", "D) needs [cite: 919]"], ans: 2 },
+
+        // Domain 5
+        { q: "47. Which GitHub Projects view is BEST suited for Agile/Kanban task management? [cite: 608]", opts: ["A) Table/Spreadsheet view [cite: 609]", "B) Board view [cite: 610]", "C) Roadmap view [cite: 611]", "D) Timeline view [cite: 612]"], ans: 1 },
+        { q: "48. Which GitHub Projects view is BEST for scheduling tasks along a timeline (similar to Gantt charts)? [cite: 614, 615]", opts: ["A) Board view [cite: 616]", "B) Table view [cite: 617]", "C) Roadmap view [cite: 618]", "D) Calendar view [cite: 619]"], ans: 2 },
+        { q: "49. What is the PRIMARY use of GitHub 'Milestones'? [cite: 633]", opts: ["A) To mark specific commits as release candidates [cite: 634]", "B) To group a set of issues together toward a single goal and track completion progress as issues are closed [cite: 635, 636]", "C) To schedule automated workflow runs [cite: 637]", "D) To define code ownership for specific files [cite: 641]"], ans: 1 },
+        { q: "50. What is the PRIMARY purpose of GitHub 'Labels'? [cite: 649]", opts: ["A) To assign issues to specific developers [cite: 650]", "B) To set deadlines for issue completion [cite: 651]", "C) To categorize and organize Issues, Pull Requests, and Discussions within a repository [cite: 652, 653]", "D) To control repository visibility settings [cite: 654]"], ans: 2 },
+
+        // Domain 6
+        { q: "51. What does GitHub's 'Branch Protection Rules' feature allow you to do? [cite: 665]", opts: ["A) Prevent specific users from viewing a branch [cite: 666]", "B) Enforce strict workflow rules on specific branches, such as requiring pull requests before merging [cite: 667]", "C) Automatically delete branches after a set period [cite: 668]", "D) Clone a protected branch to a separate repository [cite: 669]"], ans: 1 },
+        { q: "52. What does Two-Factor Authentication (2FA) protect against in GitHub? [cite: 684]", opts: ["A) SQL injection attacks on repositories [cite: 684]", "B) Unauthorized access even if the password is stolen or exposed, by requiring a second verification device [cite: 685]", "C) Automated bot activity on public repositories [cite: 686]", "D) Accidental deletion of repository branches [cite: 687]"], ans: 1 },
+        { q: "53. What does Dependabot do in GitHub? [cite: 706]", opts: ["A) It automatically merges all pull requests without review [cite: 707]", "B) It alerts you about security vulnerabilities in your project's dependencies and can auto-create pull requests to update them [cite: 708, 709]", "C) It monitors server uptime [cite: 710]", "D) It blocks all external contributors from accessing the repository [cite: 711]"], ans: 1 },
+        { q: "54. What is the purpose of 'Secret Scanning' in GitHub? [cite: 712]", opts: ["A) To find and encrypt sensitive configuration files [cite: 713]", "B) To hide repository contents from unauthorized users [cite: 714]", "C) To detect and alert when sensitive data (tokens, API keys, passwords) are accidentally pushed to the repository [cite: 715]", "D) To scan for performance bottlenecks in the code [cite: 716]"], ans: 2 },
+        { q: "55. What are 'Internal' repositories in GitHub Enterprise Cloud? [cite: 754]", opts: ["A) Repositories visible only to the repository owner [cite: 755]", "B) Repositories accessible to ALL members of the enterprise but hidden from people outside the enterprise [cite: 756, 757]", "C) Repositories that are automatically archived after 30 days [cite: 758]", "D) Repositories used exclusively for GitHub Actions workflows [cite: 759]"], ans: 1 },
+
+        // Domain 7
+        { q: "56. What is 'InnerSource' in the context of software development? [cite: 782]", opts: ["A) A GitHub feature for managing internal documentation [cite: 783]", "B) A strategy that adopts open-source best practices but applied to PROPRIETARY software within an organization's closed environment [cite: 785]", "C) A type of GitHub repository only visible to paid subscribers [cite: 786]", "D) GitHub's internal codebase for platform development [cite: 786]"], ans: 1 },
+        { q: "57. What is the PRIMARY purpose of GitHub Sponsors? [cite: 794]", opts: ["A) To allow GitHub to display advertisements in repositories [cite: 795]", "B) To enable developers and organizations to receive financial donations to support their open-source projects [cite: 796, 797]", "C) To provide free GitHub Pro accounts to all open-source maintainers [cite: 798]", "D) To fund GitHub's infrastructure and server costs [cite: 799]"], ans: 1 },
+        { q: "58. What is the PRIMARY purpose of the GitHub Marketplace? [cite: 812]", opts: ["A) To sell physical developer merchandise and hardware [cite: 813]", "B) A destination for discovering and installing apps that integrate with GitHub to extend its functionality [cite: 814, 815]", "C) A job board for hiring GitHub-certified developers [cite: 816]", "D) A platform for selling private code repositories [cite: 817]"], ans: 1 },
+        { q: "59. What does the 'GitHub Connect' feature allow? [cite: 839]", opts: ["A) Connects GitHub Codespaces to external cloud providers [cite: 840]", "B) Allows GitHub Enterprise SERVER customers to connect their self-hosted servers to github.com cloud services to share certain features [cite: 841, 842]", "C) Connects GitHub Mobile to GitHub Desktop for synchronization [cite: 843]", "D) Enables GitHub Actions to run on local machines [cite: 844]"], ans: 1 },
+        { q: "60. Which of the following about GitHub Wiki visibility is CORRECT? [cite: 857]", opts: ["A) All wikis are always public regardless of repository visibility [cite: 858]", "B) Wiki visibility follows the repository: public repo = public wiki; private repo = only those with repo access can view the wiki [cite: 859, 860]", "C) Wikis are always private regardless of repository visibility [cite: 861]", "D) Wiki visibility must be set separately from the repository settings [cite: 862]"], ans: 1 }
+    ];
+
+    const container = document.getElementById('questions-container');
+
+    questions.forEach((q, index) => {
+        let optionsHtml = '';
+        q.opts.forEach((opt, optIndex) => {
+            optionsHtml += `
+                <li>
+                    <label>
+                        <input type="radio" name="q${index}" value="${optIndex}">
+                        ${opt}
+                    </label>
+                </li>
+            `;
+        });
+
+        container.innerHTML += `
+            <div class="question-block" id="block-${index}">
+                <div class="question-text">${q.q}</div>
+                <ul class="options">
+                    ${optionsHtml}
+                </ul>
+                <div class="correct-ans" id="ans-${index}">Correct Answer: ${q.opts[q.ans]}</div>
+            </div>
+        `;
+    });
+
+    function calculateScore() {
+        let score = 0;
+        questions.forEach((q, index) => {
+            const selected = document.querySelector(`input[name="q${index}"]:checked`);
+            const block = document.getElementById(`block-${index}`);
+            const ansDiv = document.getElementById(`ans-${index}`);
+            
+            ansDiv.style.display = 'block';
+
+            if (selected) {
+                if (parseInt(selected.value) === q.ans) {
+                    score++;
+                    block.style.borderColor = '#2da44e';
+                    block.style.backgroundColor = '#e6ffec';
+                } else {
+                    block.style.borderColor = '#cf222e';
+                    block.style.backgroundColor = '#ffebe9';
+                }
+            } else {
+                block.style.borderColor = '#cf222e';
+            }
+        });
+
+        const passRate = 65; // from [cite: 8]
+        const percentage = Math.round((score / questions.length) * 100);
+        const resultsDiv = document.getElementById('results');
+        
+        let message = '';
+        if (percentage >= passRate) {
+            message = `🔥 Excellent! You Passed with ${percentage}% (${score}/${questions.length})`;
+            resultsDiv.style.color = '#1a7f37';
+            resultsDiv.style.backgroundColor = '#e6ffec';
+        } else {
+            message = `Keep studying! You scored ${percentage}% (${score}/${questions.length}). Passing is ${passRate}%.`;
+            resultsDiv.style.color = '#cf222e';
+            resultsDiv.style.backgroundColor = '#ffebe9';
+        }
+
+        resultsDiv.innerHTML = message;
+        resultsDiv.style.display = 'block';
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+
 </body>
 </html>
